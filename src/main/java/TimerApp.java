@@ -1,9 +1,10 @@
+import eu.hansolo.steelseries.extras.Clock;
 import org.joda.time.LocalTime;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import org.pushingpixels.trident.callback.TimelineCallback;
 /**
  * User: chgv
  * Date: 9/21/11
@@ -20,6 +21,7 @@ public class TimerApp implements ActionListener {
     private JSpinner minutes;
     private JSpinner seconds;
     private JPanel timePanel;
+    private Clock clock;
 
     //variables
     private Timer timer;
@@ -46,20 +48,21 @@ public class TimerApp implements ActionListener {
 
     //timer fired event
     public void actionPerformed(ActionEvent e) {
-        if (localTime.getMillisOfDay() >= 0) {
+        if (localTime.getMillisOfDay() != 0) {
             localTime = localTime.minusMillis(DEFAULT_STEP);
             updateTimeLabel();
         } else {
             stopTimer();
         }
     }
-
     //init app
     public TimerApp() {
         timer = new Timer(DEFAULT_STEP, this);
         timerLabel.setText(START_MESSAGE);
         stopButton.setVisible(false);
-
+        clock.setHour(0);
+        clock.setMinute(0);
+        clock.setSecond(0);
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (localTime == null) {
@@ -95,9 +98,13 @@ public class TimerApp implements ActionListener {
         isPause = false;
         localTime = null;
         timePanel.setVisible(true);
+        stopButton.setVisible(false);
     }
 
     private void updateTimeLabel() {
+        clock.setHour(localTime.getHourOfDay());
+        clock.setMinute(localTime.getMinuteOfHour());
+        clock.setSecond(localTime.getSecondOfMinute());
         timerLabel.setText(localTime.toString(TIME_PATTERN));
     }
 
