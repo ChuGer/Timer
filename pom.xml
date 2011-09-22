@@ -31,7 +31,7 @@
         <dependency>
             <groupId>eu.hansolo</groupId>
             <artifactId>SteelSeries</artifactId>
-            <version>3.9</version>
+            <version>3.9.6</version>
         </dependency>
         <!-- TEST SCOPE -->
         <dependency>

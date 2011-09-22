@@ -1,7 +1,12 @@
 import eu.hansolo.steelseries.extras.Clock;
+import eu.hansolo.steelseries.extras.StopWatch;
+import eu.hansolo.steelseries.gauges.DisplaySingle;
+import eu.hansolo.steelseries.gauges.LinearBargraph;
 import org.joda.time.LocalTime;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import org.pushingpixels.trident.callback.TimelineCallback;
@@ -22,11 +27,13 @@ public class TimerApp implements ActionListener {
     private JSpinner seconds;
     private JPanel timePanel;
     private Clock clock;
+    private LinearBargraph bargraph;
 
     //variables
     private Timer timer;
     private LocalTime localTime;
     private boolean isPause = false;
+    private int startTime;
 
     //constants
     private static final int DEFAULT_STEP = 1000;
@@ -50,19 +57,22 @@ public class TimerApp implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (localTime.getMillisOfDay() != 0) {
             localTime = localTime.minusMillis(DEFAULT_STEP);
+            bargraph.setValue( 100 - getSecondsCount() * 100 /startTime);
             updateTimeLabel();
         } else {
             stopTimer();
         }
     }
+
+    private int getSecondsCount(){
+        return localTime.getHourOfDay() * 3600 + localTime.getMinuteOfHour()*60 + localTime.getSecondOfMinute();
+    }
+
     //init app
     public TimerApp() {
         timer = new Timer(DEFAULT_STEP, this);
         timerLabel.setText(START_MESSAGE);
         stopButton.setVisible(false);
-        clock.setHour(0);
-        clock.setMinute(0);
-        clock.setSecond(0);
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (localTime == null) {
@@ -70,6 +80,7 @@ public class TimerApp implements ActionListener {
                             (Integer) hours.getValue(),
                             (Integer) minutes.getValue(),
                             (Integer) seconds.getValue());
+                    startTime = getSecondsCount();
                     updateTimeLabel();
                     timePanel.setVisible(false);
                     stopButton.setVisible(true);
@@ -87,6 +98,21 @@ public class TimerApp implements ActionListener {
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 stopTimer();
+            }
+        });
+        hours.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                clock.setHour((Integer) hours.getValue());
+            }
+        });
+        minutes.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                clock.setMinute((Integer) minutes.getValue());
+            }
+        });
+        seconds.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                clock.setSecond((Integer) seconds.getValue());
             }
         });
     }

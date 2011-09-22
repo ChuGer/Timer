@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="338" height="329"/>
+      <xy x="20" y="20" width="448" height="421"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -11,7 +11,9 @@
       <grid id="7974b" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
-          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="93" height="105"/>
+          </grid>
         </constraints>
         <properties/>
         <border type="none"/>
@@ -72,12 +74,13 @@
       </grid>
       <component id="79f11" class="javax.swing.JLabel" binding="timerLabel">
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="3" use-parent-layout="false">
-            <preferred-size width="195" height="21"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="195" height="105"/>
           </grid>
         </constraints>
         <properties>
           <font name="Stencil" size="26" style="1"/>
+          <horizontalAlignment value="0"/>
           <text value="Label"/>
         </properties>
       </component>
@@ -103,9 +106,55 @@
       </component>
       <component id="4355a" class="eu.hansolo.steelseries.extras.Clock" binding="clock">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="200" height="213"/>
+          </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <backgroundColor value="CARBON"/>
+          <foregroundType value="FG_TYPE1"/>
+          <foregroundVisible value="true"/>
+          <frameDesign value="TILTED_BLACK"/>
+          <frameEffect value="NONE"/>
+          <frameType value="ROUND"/>
+          <hour value="0"/>
+          <minute value="0"/>
+          <pointerColor value="CYAN"/>
+          <pointerType value="TYPE2"/>
+          <second value="10"/>
+        </properties>
+      </component>
+      <component id="63b67" class="eu.hansolo.steelseries.gauges.LinearBargraph" binding="bargraph">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="6" use-parent-layout="false">
+            <preferred-size width="150" height="270"/>
+          </grid>
+        </constraints>
+        <properties>
+          <areasVisible value="false"/>
+          <frameDesign value="TILTED_BLACK"/>
+          <frameEffect value="EFFECT_INNER_FRAME"/>
+          <glowVisible value="false"/>
+          <glowing value="false"/>
+          <initialized value="true"/>
+          <labelColorFromThemeEnabled value="true"/>
+          <lcdUnitString value=""/>
+          <lcdUnitStringVisible value="true"/>
+          <lcdVisible value="false"/>
+          <ledVisible value="true"/>
+          <majorTickmarkVisible value="true"/>
+          <minorTickmarkVisible value="true"/>
+          <niceScale value="true"/>
+          <orientation value="VERTICAL"/>
+          <thresholdVisible value="false"/>
+          <ticklabelsVisible value="true"/>
+          <tickmarkColorFromThemeEnabled value="true"/>
+          <tickmarksVisible value="true"/>
+          <title value="."/>
+          <trackVisible value="true"/>
+          <unitString value="progress"/>
+          <valueCoupled value="true"/>
+        </properties>
       </component>
     </children>
   </grid>
