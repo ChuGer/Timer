@@ -10,8 +10,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -33,7 +31,7 @@ public class TimerApp implements ActionListener {
     private JButton closeButton;
 
     //variables
-    private Timer timer = new Timer(DEFAULT_STEP, this);
+    private Timer timer;
     private LocalTime localTime;
     private boolean isPause = false;
     private int startTime;
@@ -41,21 +39,24 @@ public class TimerApp implements ActionListener {
     //constants
     private static final int DEFAULT_STEP = 1000;
     private static final String APP_NAME = "TimerApp";
-    private final ClassLoader classLoader = this.getClass().getClassLoader();
-    private final URL playURL = classLoader.getResource("images/play.png");
-    private final URL pauseURL = classLoader.getResource("images/pause.png");
+    private static final URL playURL = ClassLoader.getSystemResource("images/play.png");
+    private static final URL pauseURL = ClassLoader.getSystemResource("images/pause.png");
+    private static final URL soundURL = ClassLoader.getSystemResource("beep.wav");
+    private static final String FINAL_MESSAGE = "БДЖЫНЬ.";
+    private static final String THEME_NAME = "Nimbus";
+
 
     //entry point
     public static void main(String[] args) {
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if (THEME_NAME.equals(info.getName())) {
                     UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
         } catch (Exception e) {
-            // If Nimbus is not available, you can set the GUI to another look and feel.
+            System.err.print(e.getMessage());
         }
         JFrame frame = new JFrame(APP_NAME);
         frame.setContentPane(new TimerApp().mainPanel);
@@ -71,21 +72,25 @@ public class TimerApp implements ActionListener {
             bargraph.setValue(100 - getSecondsCount() * 100 / startTime);
             updateTimeLabel();
         } else {
-            stopTimer();
             playSound();
+            JOptionPane.showMessageDialog(mainPanel, FINAL_MESSAGE, FINAL_MESSAGE, 1);
+            stopTimer();
         }
     }
 
-    private void playSound() {
-        try {
-            InputStream in = new FileInputStream("E:\\timer\\src\\main\\java\\sound\\beep.wav");
-            AudioInputStream inputStream = AudioSystem.getAudioInputStream(in);
-            Clip clip = AudioSystem.getClip();
-            clip.open(inputStream);
-            clip.start();
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
+    public static synchronized void playSound() {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    final AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundURL);
+                    final Clip clip = AudioSystem.getClip();
+                    clip.open(inputStream);
+                    clip.start();
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }).start();
     }
 
     private int getSecondsCount() {
@@ -94,7 +99,7 @@ public class TimerApp implements ActionListener {
 
     //init app
     public TimerApp() {
-        playSound();
+        timer = new Timer(DEFAULT_STEP, this);
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (localTime == null) {
@@ -104,10 +109,7 @@ public class TimerApp implements ActionListener {
                             (Integer) seconds.getValue());
                     updateTimeLabel();
                     startTime = getSecondsCount();
-                    hours.setEnabled(false);
-                    minutes.setEnabled(false);
-                    seconds.setEnabled(false);
-                    stopButton.setEnabled(true);
+                    enableComponents(false);
                     bargraph.setValue(100);
                     bargraph.setValueAnimated(0);
                 }
@@ -153,29 +155,30 @@ public class TimerApp implements ActionListener {
         startButton.setIcon(new ImageIcon(playURL));
         isPause = false;
         localTime = null;
-        hours.setEnabled(true);
-        minutes.setEnabled(true);
-        seconds.setEnabled(true);
-        hours.setValue(0);
-        minutes.setValue(0);
-        seconds.setValue(10);
+        enableComponents(true);
         bargraph.setValue(0);
-        stopButton.setEnabled(false);
-        clock.setHour((Integer) hours.getValue());
-        clock.setMinute((Integer) minutes.getValue());
-        clock.setSecond((Integer) seconds.getValue());
+        setTime(0, 0, 0);
+    }
+
+    private void enableComponents(final boolean isEnabled) {
+        hours.setEnabled(isEnabled);
+        minutes.setEnabled(isEnabled);
+        seconds.setEnabled(isEnabled);
+        stopButton.setEnabled(!isEnabled);
     }
 
     private void updateTimeLabel() {
-        int hourOfDay = localTime.getHourOfDay();
-        clock.setHour(hourOfDay);
-        int minuteOfHour = localTime.getMinuteOfHour();
-        clock.setMinute(minuteOfHour);
-        int secondOfMinute = localTime.getSecondOfMinute();
-        clock.setSecond(secondOfMinute);
-        hours.setValue(hourOfDay);
-        minutes.setValue(minuteOfHour);
-        seconds.setValue(secondOfMinute);
+        setTime(localTime.getHourOfDay(), localTime.getMinuteOfHour(), localTime.getSecondOfMinute());
+    }
+
+    private void setTime(int hour, int minute, int second) {
+        hours.setValue(hour);
+        minutes.setValue(minute);
+        seconds.setValue(second);
+
+        clock.setHour(hour);
+        clock.setMinute(minute);
+        clock.setSecond(second);
     }
 
     private void createUIComponents() {
@@ -183,7 +186,7 @@ public class TimerApp implements ActionListener {
         hours = new JSpinner(hourLimits);
         final SpinnerModel minuteLimits = new SpinnerNumberModel(0, 0, 59, 1);
         minutes = new JSpinner(minuteLimits);
-        final SpinnerModel secondsLimits = new SpinnerNumberModel(10, 0, 59, 10);
+        final SpinnerModel secondsLimits = new SpinnerNumberModel(0, 0, 59, 5);
         seconds = new JSpinner(secondsLimits);
     }
 }
