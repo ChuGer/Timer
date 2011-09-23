@@ -146,6 +146,7 @@ public class TimerApp implements ActionListener {
         hours.setValue(0);
         minutes.setValue(0);
         seconds.setValue(10);
+        bargraph.setValue(0);
         stopButton.setEnabled(false);
         clock.setHour((Integer) hours.getValue());
         clock.setMinute((Integer) minutes.getValue());
