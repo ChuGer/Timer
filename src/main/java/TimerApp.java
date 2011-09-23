@@ -2,13 +2,16 @@ import eu.hansolo.steelseries.extras.Clock;
 import eu.hansolo.steelseries.gauges.LinearBargraph;
 import org.joda.time.LocalTime;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -30,7 +33,7 @@ public class TimerApp implements ActionListener {
     private JButton closeButton;
 
     //variables
-    private Timer timer;
+    private Timer timer = new Timer(DEFAULT_STEP, this);
     private LocalTime localTime;
     private boolean isPause = false;
     private int startTime;
@@ -41,7 +44,6 @@ public class TimerApp implements ActionListener {
     private final ClassLoader classLoader = this.getClass().getClassLoader();
     private final URL playURL = classLoader.getResource("images/play.png");
     private final URL pauseURL = classLoader.getResource("images/pause.png");
-
 
     //entry point
     public static void main(String[] args) {
@@ -70,6 +72,19 @@ public class TimerApp implements ActionListener {
             updateTimeLabel();
         } else {
             stopTimer();
+            playSound();
+        }
+    }
+
+    private void playSound() {
+        try {
+            InputStream in = new FileInputStream("E:\\timer\\src\\main\\java\\sound\\beep.wav");
+            AudioInputStream inputStream = AudioSystem.getAudioInputStream(in);
+            Clip clip = AudioSystem.getClip();
+            clip.open(inputStream);
+            clip.start();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
 
@@ -79,9 +94,7 @@ public class TimerApp implements ActionListener {
 
     //init app
     public TimerApp() {
-        timer = new Timer(DEFAULT_STEP, this);
-        stopButton.setEnabled(false);
-
+        playSound();
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (localTime == null) {
@@ -160,7 +173,6 @@ public class TimerApp implements ActionListener {
         clock.setMinute(minuteOfHour);
         int secondOfMinute = localTime.getSecondOfMinute();
         clock.setSecond(secondOfMinute);
-
         hours.setValue(hourOfDay);
         minutes.setValue(minuteOfHour);
         seconds.setValue(secondOfMinute);
