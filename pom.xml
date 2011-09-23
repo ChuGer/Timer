@@ -33,6 +33,11 @@
             <artifactId>SteelSeries</artifactId>
             <version>3.9.6</version>
         </dependency>
+        <dependency>
+            <groupId>net.java.dev.nimbus</groupId>
+            <artifactId>nimbus</artifactId>
+            <version>weekly-080113</version>
+        </dependency>
         <!-- TEST SCOPE -->
         <dependency>
             <groupId>junit</groupId>
