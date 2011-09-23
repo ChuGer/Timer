@@ -18,13 +18,11 @@ public class TimerApp implements ActionListener {
 
     //components
     private JPanel mainPanel;
-    private JLabel timerLabel;
     private JButton startButton;
     private JButton stopButton;
     private JSpinner hours;
     private JSpinner minutes;
     private JSpinner seconds;
-    private JPanel timePanel;
     private Clock clock;
     private LinearBargraph bargraph;
 
@@ -36,10 +34,7 @@ public class TimerApp implements ActionListener {
 
     //constants
     private static final int DEFAULT_STEP = 1000;
-    private static final String TIME_PATTERN = DEFAULT_STEP >= 1000 ? "HH:mm:ss" : "HH:mm:ss.S";
-    private static final String START_MESSAGE = "Hello!";
     private static final String APP_NAME = "TimerApp";
-    private static final String FINISH = "Finish";
     private final ClassLoader classLoader = this.getClass().getClassLoader();
     private final URL playURL = classLoader.getResource("images/play.png");
     private final URL pauseURL = classLoader.getResource("images/pause.png");
@@ -82,7 +77,6 @@ public class TimerApp implements ActionListener {
     //init app
     public TimerApp() {
         timer = new Timer(DEFAULT_STEP, this);
-        timerLabel.setText(START_MESSAGE);
         stopButton.setEnabled(false);
 
         startButton.addActionListener(new ActionListener() {
@@ -94,7 +88,10 @@ public class TimerApp implements ActionListener {
                             (Integer) seconds.getValue());
                     updateTimeLabel();
                     startTime = getSecondsCount();
-                    timePanel.setVisible(false);
+                    hours.setEnabled(false);
+                    minutes.setEnabled(false);
+                    seconds.setEnabled(false);
+//                    timePanel.setVisible(false);
                     stopButton.setEnabled(true);
                     bargraph.setValue(100);
                     bargraph.setValueAnimated(0);
@@ -133,11 +130,12 @@ public class TimerApp implements ActionListener {
 
     private void stopTimer() {
         timer.stop();
-        timerLabel.setText(FINISH);
         startButton.setIcon(new ImageIcon(playURL));
         isPause = false;
         localTime = null;
-        timePanel.setVisible(true);
+        hours.setEnabled(true);
+        minutes.setEnabled(true);
+        seconds.setEnabled(true);
         stopButton.setEnabled(false);
         clock.setHour((Integer) hours.getValue());
         clock.setMinute((Integer) minutes.getValue());
@@ -145,11 +143,16 @@ public class TimerApp implements ActionListener {
     }
 
     private void updateTimeLabel() {
-        clock.setHour(localTime.getHourOfDay());
-        clock.setMinute(localTime.getMinuteOfHour());
-        clock.setSecond(localTime.getSecondOfMinute());
-        timerLabel.setText(localTime.toString(TIME_PATTERN));
-        clock.setTitle(localTime.toString(TIME_PATTERN));
+        int hourOfDay = localTime.getHourOfDay();
+        clock.setHour(hourOfDay);
+        int minuteOfHour = localTime.getMinuteOfHour();
+        clock.setMinute(minuteOfHour);
+        int secondOfMinute = localTime.getSecondOfMinute();
+        clock.setSecond(secondOfMinute);
+
+        hours.setValue(hourOfDay);
+        minutes.setValue(minuteOfHour);
+        seconds.setValue(secondOfMinute);
     }
 
     private void createUIComponents() {
