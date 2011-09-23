@@ -7,6 +7,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 
 /**
@@ -25,6 +27,7 @@ public class TimerApp implements ActionListener {
     private JSpinner seconds;
     private Clock clock;
     private LinearBargraph bargraph;
+    private JButton closeButton;
 
     //variables
     private Timer timer;
@@ -91,7 +94,6 @@ public class TimerApp implements ActionListener {
                     hours.setEnabled(false);
                     minutes.setEnabled(false);
                     seconds.setEnabled(false);
-//                    timePanel.setVisible(false);
                     stopButton.setEnabled(true);
                     bargraph.setValue(100);
                     bargraph.setValueAnimated(0);
@@ -126,6 +128,11 @@ public class TimerApp implements ActionListener {
                 clock.setSecond((Integer) seconds.getValue());
             }
         });
+        closeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
     }
 
     private void stopTimer() {
@@ -136,6 +143,9 @@ public class TimerApp implements ActionListener {
         hours.setEnabled(true);
         minutes.setEnabled(true);
         seconds.setEnabled(true);
+        hours.setValue(0);
+        minutes.setValue(0);
+        seconds.setValue(10);
         stopButton.setEnabled(false);
         clock.setHour((Integer) hours.getValue());
         clock.setMinute((Integer) minutes.getValue());
