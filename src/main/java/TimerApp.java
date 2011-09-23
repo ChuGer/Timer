@@ -7,6 +7,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 
 /**
  * User: chgv
@@ -38,9 +39,11 @@ public class TimerApp implements ActionListener {
     private static final String TIME_PATTERN = DEFAULT_STEP >= 1000 ? "HH:mm:ss" : "HH:mm:ss.S";
     private static final String START_MESSAGE = "Hello!";
     private static final String APP_NAME = "TimerApp";
-    private static final String START = "Start";
-    private static final String PAUSE = "Pause";
     private static final String FINISH = "Finish";
+    private final ClassLoader classLoader = this.getClass().getClassLoader();
+    private final URL playURL = classLoader.getResource("images/play.png");
+    private final URL pauseURL = classLoader.getResource("images/pause.png");
+
 
     //entry point
     public static void main(String[] args) {
@@ -80,7 +83,7 @@ public class TimerApp implements ActionListener {
     public TimerApp() {
         timer = new Timer(DEFAULT_STEP, this);
         timerLabel.setText(START_MESSAGE);
-        stopButton.setVisible(false);
+        stopButton.setEnabled(false);
 
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -92,16 +95,16 @@ public class TimerApp implements ActionListener {
                     updateTimeLabel();
                     startTime = getSecondsCount();
                     timePanel.setVisible(false);
-                    stopButton.setVisible(true);
+                    stopButton.setEnabled(true);
                     bargraph.setValue(100);
                     bargraph.setValueAnimated(0);
                 }
                 if (isPause) {
                     timer.stop();
-                    startButton.setText(START);
+                    startButton.setIcon(new ImageIcon(playURL));
                 } else {
                     timer.start();
-                    startButton.setText(PAUSE);
+                    startButton.setIcon(new ImageIcon(pauseURL));
                 }
                 isPause = !isPause;
             }
@@ -131,11 +134,11 @@ public class TimerApp implements ActionListener {
     private void stopTimer() {
         timer.stop();
         timerLabel.setText(FINISH);
-        startButton.setText(START);
+        startButton.setIcon(new ImageIcon(playURL));
         isPause = false;
         localTime = null;
         timePanel.setVisible(true);
-        stopButton.setVisible(false);
+        stopButton.setEnabled(false);
         clock.setHour((Integer) hours.getValue());
         clock.setMinute((Integer) minutes.getValue());
         clock.setSecond((Integer) seconds.getValue());
@@ -146,7 +149,6 @@ public class TimerApp implements ActionListener {
         clock.setMinute(localTime.getMinuteOfHour());
         clock.setSecond(localTime.getSecondOfMinute());
         timerLabel.setText(localTime.toString(TIME_PATTERN));
-        clock.setUnitString(localTime.toString(TIME_PATTERN));
         clock.setTitle(localTime.toString(TIME_PATTERN));
     }
 
