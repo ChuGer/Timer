@@ -10,6 +10,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -19,6 +20,7 @@ import java.net.URL;
  */
 public class TimerApp implements ActionListener {
 
+    private static final String AIMP_PATH = "D:\\Program Files\\AIMP3\\AIMP3.exe";
     //components
     private JPanel mainPanel;
     private JButton startButton;
@@ -63,6 +65,7 @@ public class TimerApp implements ActionListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+
     }
 
     //timer fired event
@@ -73,7 +76,7 @@ public class TimerApp implements ActionListener {
             updateTimeLabel();
         } else {
             playSound();
-            JOptionPane.showMessageDialog(mainPanel, FINAL_MESSAGE, FINAL_MESSAGE, 1);
+            JOptionPane.showMessageDialog(mainPanel, FINAL_MESSAGE, FINAL_MESSAGE, JOptionPane.INFORMATION_MESSAGE);
             stopTimer();
         }
     }
@@ -91,6 +94,12 @@ public class TimerApp implements ActionListener {
                 }
             }
         }).start();
+        String[] cmd = {AIMP_PATH, "/play"};
+        try {
+            Runtime.getRuntime().exec(cmd);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     private int getSecondsCount() {
