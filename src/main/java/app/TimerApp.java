@@ -1,6 +1,10 @@
+package app;
+
 import eu.hansolo.steelseries.extras.Clock;
 import eu.hansolo.steelseries.gauges.LinearBargraph;
 import org.joda.time.LocalTime;
+import utils.SettingUtils;
+import utils.ThemeUtils;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -10,6 +14,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -20,7 +25,6 @@ import java.net.URL;
  */
 public class TimerApp implements ActionListener {
 
-    private static final String AIMP_PATH = "D:\\Program Files\\AIMP3\\AIMP3.exe";
     //components
     private JPanel mainPanel;
     private JButton startButton;
@@ -38,29 +42,12 @@ public class TimerApp implements ActionListener {
     private boolean isPause = false;
     private int startTime;
 
-    //constants
-    private static final int DEFAULT_STEP = 1000;
-    private static final String APP_NAME = "TimerApp";
-    private static final URL playURL = ClassLoader.getSystemResource("images/play.png");
-    private static final URL pauseURL = ClassLoader.getSystemResource("images/pause.png");
-    private static final URL soundURL = ClassLoader.getSystemResource("beep.wav");
-    private static final String FINAL_MESSAGE = "БДЖЫНЬ.";
-    private static final String THEME_NAME = "Nimbus";
-
+    private SettingUtils settings;
 
     //entry point
     public static void main(String[] args) {
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if (THEME_NAME.equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            System.err.print(e.getMessage());
-        }
-        JFrame frame = new JFrame(APP_NAME);
+        ThemeUtils.initTheme();
+        JFrame frame = new JFrame("Timer");
         frame.setContentPane(new TimerApp().mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
@@ -71,21 +58,21 @@ public class TimerApp implements ActionListener {
     //timer fired event
     public void actionPerformed(ActionEvent e) {
         if (localTime.getMillisOfDay() != 0) {
-            localTime = localTime.minusMillis(DEFAULT_STEP);
+            localTime = localTime.minusMillis(settings.getStep());
             bargraph.setValue(100 - getSecondsCount() * 100 / startTime);
             updateTimeLabel();
         } else {
             playSound();
-            JOptionPane.showMessageDialog(mainPanel, FINAL_MESSAGE, FINAL_MESSAGE, JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(mainPanel, settings.getFinalMessage(), settings.getAddingMessage(), JOptionPane.INFORMATION_MESSAGE);
             stopTimer();
         }
     }
 
-    public static synchronized void playSound() {
+    public synchronized void playSound() {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    final AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundURL);
+                    final AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(settings.getSoundURL()));
                     final Clip clip = AudioSystem.getClip();
                     clip.open(inputStream);
                     clip.start();
@@ -94,7 +81,7 @@ public class TimerApp implements ActionListener {
                 }
             }
         }).start();
-        String[] cmd = {AIMP_PATH, "/play"};
+        String[] cmd = {settings.getAimpPath(), settings.getAimpOption()};
         try {
             Runtime.getRuntime().exec(cmd);
         } catch (IOException e) {
@@ -108,7 +95,13 @@ public class TimerApp implements ActionListener {
 
     //init app
     public TimerApp() {
-        timer = new Timer(DEFAULT_STEP, this);
+        settings = new SettingUtils();
+        timer = new Timer(settings.getStep(), this);
+
+        startButton.setIcon(new ImageIcon(settings.getPlayURL()));
+        stopButton.setIcon(new ImageIcon(settings.getStopURL()));
+        closeButton.setIcon(new ImageIcon(settings.getCloseURL()));
+
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (localTime == null) {
@@ -124,10 +117,11 @@ public class TimerApp implements ActionListener {
                 }
                 if (isPause) {
                     timer.stop();
-                    startButton.setIcon(new ImageIcon(playURL));
+                    if (settings.getPlayURL() !=null)
+                    startButton.setIcon(new ImageIcon(settings.getPlayURL()));
                 } else {
                     timer.start();
-                    startButton.setIcon(new ImageIcon(pauseURL));
+                    startButton.setIcon(new ImageIcon(settings.getPauseURL()));
                 }
                 isPause = !isPause;
             }
@@ -161,7 +155,7 @@ public class TimerApp implements ActionListener {
 
     private void stopTimer() {
         timer.stop();
-        startButton.setIcon(new ImageIcon(playURL));
+        startButton.setIcon(new ImageIcon(settings.getPlayURL()));
         isPause = false;
         localTime = null;
         enableComponents(true);
